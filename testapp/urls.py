@@ -6,5 +6,7 @@ from testapp import views
 
 urlpatterns = [
     # 通过url函数设置url路由配置项
-    path('index', views.index)
+    path('index', views.index),
+    path('index2', views.index_2),
+
 ]
