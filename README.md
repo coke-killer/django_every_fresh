@@ -1,17 +1,35 @@
 # Django
-[简体中文]()
+
+[简体中文](README.md) ∙ [英文](README.md)
+
+## 安装及环境准备
+
+基于`python3.9.4`与`Django3.2`
+
 ### 项目相关文件
 
-settings: 数据库等的配置文件
-__init__.py一个空文件告诉项目说明django_every_fresh是一个python的包 urls 是路由配置 wsgi.py 一个兼容web项目的入口以便兼容web 项目 asgi.py
-一个兼容web项目的入口以便兼容web 项目 manage.py 一个命令行工具，以各种项目和django进行交互 新疆项目： python manage.py startapp test 创建app
+`settings`: 数据库等的配置文件  
+`__init__.py`一个空文件告诉项目说明  
+`django_every_fresh`是一个`python`的包   
+`urls` 是路由配置  
+`wsgi.py` 一个兼容web项目的入口以便兼容web 项目  
+`asgi.py` 一个兼容web项目的入口以便兼容web 项目  
+`manage.py` 一个命令行工具，让各种项目和django进行交互   
+新建项目时在终端执行：
+
+```bash 
+python manage.py startapp test
+```
+
+
+
+创建app
 
 ### ===============================================================
 
-再django项目中一个功能模块用一个应用来实现
+## 在django项目中一个功能模块用一个应用来实现
 
 ## app相关文件
-
 在新创建的app python中的一些文件
 __init__.py一个空文件告诉项目说明此app包是一个python的包 models.py写数据库相关的内容 test.py写测试的代码 views.py 定义处理函数也就是视图函数 处理每个请求 admin.py
 就是和网站后台管理相关的，比如通过wab界面而不是通过sql语句的方式往数据库中添加字段 建立应用和项目之间的联系，需要**对应用进行注册**  就是项目其实不知道应用本身存在 修改setting中的 INSTALLED_APPS
