@@ -127,8 +127,77 @@ admin.site.register(HeroInfo, HeroInfoAdmin)
     - 定义模板上下文，像模板文件传递数据
     - 模板渲染，得到一个标准的html内容
 
+### model 模型类属性命名限制
 
+- 不能是python保留字
+- 不能出现__连续的下划线，由python查询方式决定
+- 定义属性时需要指定字段类型，通过字段类型的参数指定选项
+    - 属性名=models.字段类型(选项)
+    - 字段类型定义在 django.db.models包中，字段类型如下：
+        - `AutoField` 自动增长,通常不用指定,为id属性默认创建
+        - `BooleanField` 布尔字段，值为True,或者False
+        - `NullBooleanField` 支持Null,True,False 三种类型
+        - `CharField(max length=最大长度)`字符串
+        - `TextField` 文本字段，一般超过4000字
+        - `IntegerField` 整数
+        - `DecimalField(max_digits=None,decimal places=None) `十进制浮点是 ,max_digits表示总位，decimal_places表示小数位数，价格
+        - ` FloatField` (浮点数，同上，精确度不同,比不上DecimalField)
+        - `DateField([auto_now=False,auto_now_add=False])` 日期字段auto_now_add=True创建对象的时候自动赋值为当前时间，auto_now表示最后一次修改的时间戳
+        - `DateTimeField` 日期时间同上
+        - `FileField` 上传文件字段
+        - `InmageField` 继承自FileField,对上传内容进行校验，确保是有效的图片
+    - 通过选项实现对字段的约束
+        - `default` 默认值,设置默认值
+        - `primary key`主键，一般加上AutoField
+        - `unique` 若为True,字段在表中必须有唯一值
+        - `db_index` 若为True 自动在表中创建索引
+        - `db_column` 字段的名称，如果未指定，则使用属性的名称
+        - `null` 如果为True,表示允许为空，默认值是False
+        - `blank` 如果为True，则该字段允许为空白，默认值是False
+    - `default` 和 `blank` 不影响表结构，不用继续迁移
 
+# ORM联合查询原则
+
+### 通过模型类.objects属性可以调用如下函数
+
+- get 返回表中满足条件且只能有一条的数据 如果有多条数据回抛出异常
+- all 返回所有数据是一个QuerySet 查询集类型对象
+- filter 条件格式 ，返回满足条件的数据
+    - 模型类属性名__条件名=值  
+      a) 判断相等 条件名：exact 查询编号为1 的图书 `BookInfo.objects.get(id=1)|BookInfo.objects.get(id__exact(1)|`    
+      b) 模糊查询 查询书包含'传'的图书 `Bookinfo.objects.filter(b_title__contains('传'))`  查询书名以'部结尾'
+      的图书 `BookInfo.objects.filter(b_title__endwith('部')`  
+      c) 空查询 innull 查询书名不为空的图书 ```sql select * from book_bookinfo where b_title is not null```
+      BookInfo.objects.filter(b_title__isnull=False)  
+      d) 范围查询 id为1或者3或者5的图书 ```sql select * from book_bookinfo where id in (1,3,5)```对应的ORM方式为Boobinfo.objects.filter(
+      b_id__in=[1,3,5])  
+      e) 比较查询 gt ,gte, lt ,lte 查询id大于3的图书 ```sql select * from book_bookinfo where id >3``` Bookinfo.objects.filter(
+      id__gt=3)  
+      f) 日期查询 查询1980年发表的图书 Bookinfo.objects.filter(
+      b_pub_date__year=1980)
+      Bookinfo.objects.filter(
+      b_pub_data__month=12) ```sql select * from book_bookinfo where b_pub_date between '1980-01-01' and '1980-12-31'```
+      g) 查询出版日期大于1980年1月1日 Bookinfo.objects.filter(b_pub_date__gt=date(1980,1,1))
+    - exclude 返回不满足条件的数据   
+      a)Bookinfo.objects.exclude(id=3)
+    - order by 排序   
+      a) BookInfo.objects.all().order_by('id')  升序  
+      b) BookInfo.objects.all().order_by('-id')  降序  
+      c) 把id大于3的图书信息按阅读量从大到小排序显示 : BookInfo.objects.filter(id__gt=3).order_by('b_read')
+    - Q 对象 作用：用于查询条件之间的逻辑关系。 not或者or ,可以对Q对象进行&|-操作。  `from django.db.models import Q`
+      a) 查询id大于3或者阅读量大于30的图书信息 ：BookInfo.objects.filter(Q(id__gt=3)|Q(b_read__gt=30))
+      b) 查询id大于3或者阅读量大于30的图书信息 ：BookInfo.objects.filter(Q(id__gt=3)&Q(b_read__gt=30))
+      c) 查询id不等于3 的图书信息 ：BookInfo.objects.filter(~Q(id=3))
+    - F 对象 用于类属性之间的比较   
+      a)查询图书阅读量大于评论量的图书信息： BookInfo.objects.filter(b_read__gt=F('b_comment'))  
+      b)查询图书阅读量大于2倍阅读量的叙述信息 BookInfo.objects.filter(b_read__gt=F('b_comment')*2)
+    - 聚合函数 sum,avg,count,max,min aggregate函数   
+      a) 查询所有图书的数目 ： BookInfo.objects.all().aggregate(Count('id'))   .all可以省略 BookInfo.objects.count()
+      b) 所有图书阅读量的综合 ：BookInfo.objects.aggregate(Sum('b_read'))  
+      c) 统计所有id大于3的所有图书的数目 BookInfo.objects.filter(id__gt=3).count()
+- all,filter,exclude,order_by,aggregrate      
+- 一对多正向查询时：对象名字.多类名子小写_set()
+    
 
 
 
