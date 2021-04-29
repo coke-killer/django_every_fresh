@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>图书展示首页</title>
+</head>
+<body>
+{#href里面以/开头映射起始位置才会正确#}
+<a href="/book/insert">新增</a>
+<ul>
+    {% for book in books %}
+        <li>{{ book.b_title }}--<a href="/book/delete/{{ book.id }}">删除</a></li>
+    {% empty %}
+        <li>暂时无此英雄信息</li>
+    {% endfor %}
+</ul>
+</body>
+</html>
