@@ -195,10 +195,36 @@ admin.site.register(HeroInfo, HeroInfoAdmin)
       a) 查询所有图书的数目 ： BookInfo.objects.all().aggregate(Count('id'))   .all可以省略 BookInfo.objects.count()
       b) 所有图书阅读量的综合 ：BookInfo.objects.aggregate(Sum('b_read'))  
       c) 统计所有id大于3的所有图书的数目 BookInfo.objects.filter(id__gt=3).count()
-- all,filter,exclude,order_by,aggregrate      
-- 一对多正向查询时：对象名字.多类名子小写_set()
-    
+    - 查询集 all,filter,exclude,order_by,aggregate 查询之后是一个QuerySet对象 可以继续调用这些函数  
+      a) 惰性查询 ：只有再使用查询集里面护具的时候才会真正查询  
+      b) 缓存：当使用同一个查询集的时候，第一次会查询，再次使用会使用缓存里面的结果。  
+      c) 限制查询集进行切片，产生的是一个新的查询集，这个下标不允许为负值   
+      d) 取出查询集第一条数据的两种方式 ： b[0] 不存在会抛出IndexError异常，b[0:1].get() 不存在抛出DoesNotExist异常，exists： 判断一个查询集是否有数据
 
+# 模型类关系
+
+- 一对多关系  
+  a) 图书-英雄类 models.ForeignKey() 定义在多的类中
+- 多对多关系  
+  a) 新闻-新闻类型 体育信息 国际信息 定义在那个类中都可以 models.ManyToManyField()
+- 一对一关系   
+  a) 员工的基本信息-员工详细信息表 定义在哪个类中都可以 models.OneToOneField()
+
+# 关联查询
+
+- 一对多关联查询  
+  a)  查询图书id为1的所有英雄的信息 一对多正向查询时：对象名字.多类名子小写_
+  set()  `book=BookInfo.objects.get(id=1) book_heroinfo_set.all()` `HeroInfo.objects.filter(h_book__id=1)`
+  b)  查询id为1的英雄的关联图书的信息
+  一对多反向查询时：对象名字.单类关联属性()`hero=HeroInfo.objects.get(id=1) hero.h_book()` `BookInfo.objects.filter(heroinfo__id=1)`
+- 通过模型类实现关联查询  
+  a)  查询图书信息，要求图书中的英雄的描述包含‘八’  `BookInfo.objects.filter(heroinfo__h_comment__contents='八')`  相当于inner join b)
+  b)  查询图书信息，要求图书中英雄id 大于 3 `BookInfo.objects,filter(heroinfo__id__gt=3)`  
+  c)  查询书名为”天龙八部的“ 所有英雄  `HeroInfo.objects.filter(h_book__b_title='天龙八部')`  
+  d)  
+  
+
+    
 
 
 
