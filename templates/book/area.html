@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>获取黑龙江省的上级地区和下级地区</title>
+</head>
+<body>
+<h1>当前地区：</h1> <br>
+{{ pl.p_title }} <br>
+<h1>当前地区的上级地区</h1> <br>
+
+{{ parent.p_title }}<br>
+<h1>下级地区</h1>
+<ul>
+    {% for child in children %}
+        <li>{{ child.p_title }}</li>
+    {% endfor %}
+</ul>
+</body>
+</html>
