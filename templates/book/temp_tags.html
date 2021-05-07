@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+{#加载自定义过滤器#}
+{% load filters %}
+<head>
+    <meta charset="UTF-8">
+    <title>temp_tags</title>
+    <style>
+        .red {
+            background: red;
+        }
+
+        .yellow {
+            background: yellow;
+        }
+
+        .green {
+            background: green;
+        }
+    </style>
+</head>
+<body>
+<ul>
+    {#比较操作符两边必须有空格#}
+    {% for book in books %}
+        {#        {% if book.id <= 2 %}#}
+        {#        {% if book.id|mod %}#}
+        {% if book.id|mod_val:3 %}
+            <li class="red">{{ forloop.counter }}--{{ book.b_title }}--{{ book.b_pub_date | date:'Y年-M月-d日' }}</li>
+        {% elif book.id <= 4 %}
+            <li class="green">{{ forloop.counter }}--{{ book.b_title }}--{{ book.b_pub_date }}</li>
+        {% else %}
+            <li class="yellow">{{ forloop.counter }}--{{ book.b_title }}--{{ book.b_pub_date }}</li>
+        {% endif %}
+    {% endfor %}
+</ul>
+default过滤器 <br>
+{{ content|default:'显示默认值' }}
+{#单行注释#}
+{% comment %}
+这是一个多行注释
+{% endcomment %}
+<!--html 注释会在网页上面显示-->
+<!--123-->
+</body>
+</html>

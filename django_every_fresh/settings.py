@@ -79,9 +79,12 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',  # 数据库引擎
         'NAME': 'django',  # 数据库名字
         'HOST': '127.0.0.1',  # 本机地址
+        # 'HOST': '172.16.49.150',  # 本机地址
         'PORT': 3306,
         'USER': 'root',
+        # 'USER': 'debian-sys-maint',
         'PASSWORD': 'yudongyue',
+        # 'PASSWORD': 'ZGo3SJlFMhvMR6Kt',
     }
 }
 

@@ -2,11 +2,11 @@
 
 [简体中文](README.md) ∙ [英文](README.md)
 
-## 安装及环境准备
+# 安装及环境准备
 
 基于`python3.9.4`与`Django3.2`
 
-### 项目相关文件
+# 项目相关文件
 
 `settings`: 数据库等的配置文件  
 `__init__.py`一个空文件告诉项目说明  
@@ -37,26 +37,26 @@ python manage.py startapp test
 `admin.py` 就是和网站后台管理相关的，比如通过wab界面而不是通过sql语句的方式往数据库中添加字段 建立应用和项目之间的联系，需要
 **对应用进行注册**  就是项目其实不知道应用本身存在 修改`setting`中的 `INSTALLED_APPS`
 
-### MVC模式 核心思想就是解耦
+# MVC模式 核心思想就是解耦
 
 M Model 模型与数据库进行交互  
 V 视图 产生html页面  
 C Controller,控制器 接受请求，与m和v进行交互，返回应答
 
-### Django 开发的网站 MVT模式 遵循MVC类似思想，没有控制器
+# Django 开发的网站 MVT模式 遵循MVC类似思想，没有控制器
 
 M model 模型 与数据库进行交互  
 V view 视图 由视图模块接受数据  
 T template 模板 和MVC中的V功能相同 由view进行参数接受然后处理然后利用model和数据库进行交互，通过template产生一个页面进行交互
 
-### Django 自带 ORM框架 通过类和对象进行操作 也可以根据设计的类生成数据库中的表
+# Django 自带 ORM框架 通过类和对象进行操作 也可以根据设计的类生成数据库中的表
 
 O object 对象类  
 R relations 关系数据库中的表  
 M mapping 映射  
 通过类和对象操作数据库和表，不需要写SQL语句
 
-### 创建数据库表的两个步骤
+# 创建数据库表的两个步骤
 
 - 生成迁移文件 命令
   ```bash
@@ -68,7 +68,7 @@ M mapping 映射
   ```
 - 表名为应用名模型类名小写
 
-### 通过admin.py后台管理页面操作数据表
+# 通过admin.py后台管理页面操作数据表
 
 - 语言和时区的本地化
     - 修改`setting`文件 的语言和时区
@@ -107,7 +107,7 @@ admin.site.register(BookInfo, BookInfoAdmin)
 admin.site.register(HeroInfo, HeroInfoAdmin)
 ```
 
-### 视图函数定义在view中，必须有一个参数request
+# 视图函数定义在view中，必须有一个参数request
 
 - 定义app的urls配置文件，项目启动之后先找项目的urls的关联地址，然后在进入每个urls的关联地址进行匹配
   > [Django3.0path 配置教程](https://blog.csdn.net/u014535666/article/details/100668837)
@@ -115,7 +115,7 @@ admin.site.register(HeroInfo, HeroInfoAdmin)
     path('', include('testapp.urls')),  # 包含testapp中的urls文件
   ```
 
-### 模板文件的使用
+# 模板文件的使用
 
 - 在工程下创建模板文件夹
 - 配置模板目录
@@ -127,7 +127,7 @@ admin.site.register(HeroInfo, HeroInfoAdmin)
     - 定义模板上下文，像模板文件传递数据
     - 模板渲染，得到一个标准的html内容
 
-### model 模型类属性命名限制
+# model 模型类属性命名限制
 
 - 不能是python保留字
 - 不能出现__连续的下划线，由python查询方式决定
@@ -158,7 +158,7 @@ admin.site.register(HeroInfo, HeroInfoAdmin)
 
 # ORM联合查询原则
 
-### 通过模型类.objects属性可以调用如下函数
+# 通过模型类.objects属性可以调用如下函数
 
 - get 返回表中满足条件且只能有一条的数据 如果有多条数据回抛出异常
 - all 返回所有数据是一个QuerySet 查询集类型对象
@@ -314,11 +314,65 @@ class Meta:
       保存在`COOKIES`中
     + cookie 是有过期时间的，如果不指定， 默认关闭浏览器之后cookie就会过期
 - *session 存储在服务器端*
-    + 你->去办健身卡，你的信息（session）都保存在电脑中，给你一个卡号（cookie sessionId），下一次只需要你的卡号，我就可以从我的电脑中找到你的信息
-    + 
-  
+    + 你->去办健身卡，你的信息（session）都保存在电脑(服务器)中，给你一个卡号（cookie sessionId），下一次只需要你的卡号，我就可以从我的电脑中找到你的信息
+    + --------------------------------------------
+    + session_key | session_data |
+    + --------------------------------------------
+    + 唯一标识码 |{'username':123,'age':10}|
+    + --------------------------------------------
+    + 返回应答，让浏览器保存这个唯一标识码也就是session_id
+    + 在访问网站，服务器获取session_id,根据session_id的值取出对应的session的信息
+    + 特点： 以键值对存储，依赖于cookie，是唯一的，唯一标识码保存在session_id cookie中，也是有过期时间的
+    + 设置`session` `request.session['username']='xiaowang'`  `request.setsession='''`
+    + 设置`session` 的过期时间 `request.session.set_expiry(5)` 秒数，0关闭浏览器过期，None,默认两周
+    + 使用`session`可以记住用户的登录状态 ,登录之后设置一个session.只要有这个session就说明是登陆过了，
 
-    
+# `cookie` 和 `session` 使用场景
 
++ `cookie` 记住用户名，安全性要求不高，保存再浏览器端
++ `session` 涉及到安全性要求比较高的数据。银行卡账号，密码，保存在服务器端
 
+# 模板文件不仅仅是html好包含下面两个内容
+
++ 静态内容 `css、js、html`
++ 动态内容： 用于动态去产生一些网页内容，通过模板语言来产生
+
+# 模板文件的使用
+
++ 通常是在视图函数中使用模板产生`html`内容返回给客户端
+    + 加载模板文件 `loder.get_template` 获取模板文件的内容，产生一个模板对象
+    + 定义模板上下文`RequestContext` 给模板文件传递数据
+    + 模板渲染产生`html` 页面内容 `render` 用传递的数据替换相应的变量，产生一个替换后的标砖的`html`内容
+
+# 模板文件加载顺序
+
++ 首先先去配置的模板目录下面招模板（html）文件
++ 去installed_apps下面的每个应用去找模板文件，前提是应用中必须有templates文件夹
+
+# 模板语言
+
++ 模板语言简称未`DTL` `Django Template Language`
+
+# 模板变量 全部通过点进行获取
+
++ 模板变量有数字、字母、下划线和点组成，*不能以下划线开头*，使用模板变量：{{模板变量名}}
++ 模板变量的解释顺序：
+    + 例如`{{book.b_title}}`  
+      a) 首先把book当成一个字典，把`b_title`当成键名，进行取值，`book['b_title']`  
+      b) 把book当成一个对象，把`b_title`当成属性，进行取值`book.b_title`  
+      c) 把book当成一个对象，把`b_title`当成对象的方法，进行取值`book.b_title`
+    + 例如`{{book.0}}`  
+      a) 首先把book当成一个字典，把0当成键名，进行取值`book['0']`  
+      b) 把book当成一个列表，把0当成下表，进行取值`book[0]`
+    + 如果解析失败，则产生内容时用空字符串填充模板变量
+    + 使用模板变量时：前面的可能是一个 字典、一个对象或者是一个列表
+
+# 模板标签
+
++ 循环 `{%if%} {%end if%}`
++ 条件判断
++ 过滤器 改变日期显示格式 格式： 模板变量|过滤器：参数 `{{ book.b_pub_date | date:'Y年-M月-d日'}}`
++ [模板标签和内置过滤器参考资料](https://blog.csdn.net/lengfengyuyu/article/details/83342639)
+
+# 模板继承享有共同的部分减少代码复用
 

@@ -17,4 +17,10 @@ urlpatterns = [
     path('book/login_ajax_check', views.login_ajax_check),
     path('book/set_cookie', views.set_cookie),  # 设置cookie
     path('book/get_cookie', views.get_cookie),
+    path('book/set_session', views.set_session),
+    path('book/get_session', views.get_session),
+    path('book/clear_session', views.clear_session),
+    path('book/index2', views.index_two),
+    path('book/temp_var', views.temp_var),
+    path('book/temp_tags', views.temp_tags),
 ]

@@ -47,12 +47,18 @@ def books(request):
 
 def login_before(request):
     # 获取cookie  username
-    if 'username' in request.COOKIES:
-        # 获取记住的用户名
-        username = request.COOKIES['username']
+    # 判断用户是否登录
+    if request.session.has_key('is_login'):
+        # 用户已经登录
+        return HttpResponseRedirect('/book/index')
     else:
-        username = ''
-    return render(request, "book/login.html", {'username': username})
+        # 用户未登录
+        if 'username' in request.COOKIES:
+            # 获取记住的用户名
+            username = request.COOKIES['username']
+        else:
+            username = ''
+        return render(request, "book/login.html", {'username': username})
 
 
 def login_check(request):
@@ -72,6 +78,8 @@ def login_check(request):
         if remember == 'on':
             # 设置cookie username 过期时间
             resp.set_cookie('username', name, max_age=7 * 24 * 3600)
+            # 记住用户的登陆状态,只要session中由is_login，就认为已经登录
+            request.session['is_login'] = True
         return resp
 
     else:
@@ -119,3 +127,45 @@ def get_cookie(request):
     # 获取cookie信息
     num = request.COOKIES.get('num')
     return HttpResponse(num)
+
+
+def set_session(request):
+    # 设置 session
+    request.session['username'] = 'mini'
+    request.session['age'] = 18
+    # request.session.set_expiry(5)
+    return HttpResponse('设置session')
+
+
+def get_session(request):
+    # 获取session
+    username = request.session['username']
+    age = request.session['age']
+    return HttpResponse(username + ':' + str(age))
+
+
+def clear_session(request):
+    # request.session.clear()
+    request.session.flush()
+    return HttpResponse('清除成功')
+
+
+# /book/index2
+def index_two(request):
+    '''模板文件加载顺序'''
+    return render(request, 'index2.html')
+
+
+def temp_var(request):
+    '''模板变量'''
+    my_dict = {'title': '字典键值'}
+    my_list = [1, 2, 3]
+    book = BookInfo.objects.get(id=1)
+    context = {'my_dict': my_dict, 'my_list': my_list, 'book': book}
+    return render(request, 'book/temp_var.html', context)
+
+
+def temp_tags(request):
+    '''模板标签'''
+    books = BookInfo.objects.all()
+    return render(request, 'book/temp_tags.html', {'books': books})
