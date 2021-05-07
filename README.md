@@ -217,11 +217,105 @@ admin.site.register(HeroInfo, HeroInfoAdmin)
   set()  `book=BookInfo.objects.get(id=1) book_heroinfo_set.all()` `HeroInfo.objects.filter(h_book__id=1)`
   b)  查询id为1的英雄的关联图书的信息
   一对多反向查询时：对象名字.单类关联属性()`hero=HeroInfo.objects.get(id=1) hero.h_book()` `BookInfo.objects.filter(heroinfo__id=1)`
-- 通过模型类实现关联查询  
+- 通过模型类实现关联查询时:要查哪个表中的数据就需要通过哪个类来查 写关联查询条件的时候，如果类中没有关系属性条件需要写对应类的名字如果有关系属性则需要些关系属性  
   a)  查询图书信息，要求图书中的英雄的描述包含‘八’  `BookInfo.objects.filter(heroinfo__h_comment__contents='八')`  相当于inner join b)
   b)  查询图书信息，要求图书中英雄id 大于 3 `BookInfo.objects,filter(heroinfo__id__gt=3)`  
-  c)  查询书名为”天龙八部的“ 所有英雄  `HeroInfo.objects.filter(h_book__b_title='天龙八部')`  
-  d)  
+  c)  查询书名为”天龙八部的“ 所有英雄  `HeroInfo.objects.filter(h_book__b_title='天龙八部')`
+- 自关联那是一种特殊的一对多关系
+- 管理器 objects 是Django自动生成的models.Manger类的一个对象 每个类有一个这个对象 通过这个管理器可以实现对数据的查询 自定义管理器之后Django不再帮我们生成默认的objects管理器  
+  a) 自定义一个管理器 ，这个类继承models.Manger类 再`BookInfo`类中定义 `book = models.Manager` 之后需要使用`Bookinfo.book.all()` 来查询  
+  b) 目的： 改变查询的结果集  
+  c) 封装增删改查函数，又使得model中的数据不变,可以将放在BookInfo中封装的函数放入BookInfoManager中。使用`self.model()`就可以创建一个跟自定义管理器对应的模型类对象
+  ```python
+    @classmethod
+    def create_book(cls, b_title, b_pub_date, b_read, b_comment, is_delete):
+        # 1、创建对象
+        book = cls(b_title=b_title, b_pub_date=b_pub_date, b_read=b_read, b_comment=b_comment, is_delete=is_delete)
+        # 2、保存进数据库
+        book.save()
+        return book
+  ```
+  ```python
+    @staticmethod
+    from book.models import BookInfo
+    def create_book(b_title, b_pub_date, b_read, b_comment, is_delete):
+        # 1、创建一个图书对象
+        book = BookInfo()
+        book.b_title = b_title
+        book.b_comment = b_comment
+        book.b_read = b_read
+        book.b_pub_date = b_pub_date
+        book.is_delete = is_delete
+        # 2、保存进数据库
+        book.save()
+        return book
+  ```
+- 模型和管理器之间的关系
+
+1. 模型类BookInfo继承自models.Model 通过`objects=BookInfoManager()`在`BookInfo`中创建对象
+2. 模型管理器类BookInfoManager 继承自models.Manager  `self.model()`获取 `self` 所在模型类的类名
+
+- 通过元选项指定数据库表名，使得数据库表明不依赖 app的名字
+
+```python
+class Meta:
+    db_table = 'bookinfo' 
+```
+
+# 视图功能
+
+- 视图功能： 接受请求，进行处理，与M和T进行交互，返回应答 返回HTML内容 HttpResponse,也可能重定向redirect
+- 使用：
+    1. 定义视图函数，request参数必须有，是一个HttpRequest类型的对象。参数名可以变化
+    2. 配置url，建立url和视图函数之间的对应关系
+- url 配置过程
+    1. 在项目的url文件中包含具体应用的urls文件，在具体应用的urls文件中包含url和视图的对应关系
+    2. url配置项是顶底在一个名字叫urlpatterns的列表中，其中每一个元素都是一个配置项，每一个配置项都调用url函数
+- 视图错误
+    + 404: 找不到页面，默认会显示一个标准的作物页面，如果要显示自定义页面，则需要在template目录下面自定义一个`404.html`文件
+        + url每日有配置
+        + url配置错误
+    + 500服务端的错误
+        + 代码出错
+    + 网站开发完需要关闭调试，在settings.py文件中
+        + debug=False
+        + ALLOWED_HOST=['*']
+- 捕获url参数  
+  进行url匹配时，把所需要捕获的部分设置成一个正则表达式组，这样django框架就会自动把匹配成功后相应组的内容作为参数传递给视图函数
+    + 位置参数： 位置参数，参数名可以随意指定`url=(r'^showarg(\d+)$',views.show_arg)`
+    + 关键字参数： 在位置参数的基础上给正则表达式组命名即可。`url=(r'^showarg(?p<num>\d+)$',views.show_arg)`
+    + ?p<组名> 组名和视图函数接收的参数名一致
+    + 关键字参数，视图中参数名必须和正则表达式名一致
+- HttpRequest参数
+    + method 获取请求方式, get|post
+    + path 一个字符串，表示请求的完整路径，不包括域名和参数部分
+    + encoding 一个字符串，None表示提使用浏览器默认设置，一般为utf-8，可以通过修改它来修改访问表单数据使用的编码，接下来对属性的任何访问将使用新的encoding
+    + GET QueryDict类型对象。类似于字典，包含get请求方式的所有参数
+    + POST QueryDict类型对象。类似于字典，包含post请求方式的所有参数
+    + COOKIES 保存浏览器发送给服务器的cookie以键值对的形式
+    + session
+- *ajax 异步的javascript ，在不加载页面的情况加，对页面进行局部刷新。*
+  ```ajax
+  $.ajax({
+    'url': 请求地址,
+    'type':请求方式,
+    'dataType':预期返回的数据格式,
+    'data'：参数
+  }).success(function(data){
+    //回调函数
+  })
+  ```
+- *cookie 由老板也就是服务器生成存储在浏览器的一小段文本信息*
+    + 你(浏览器)->老板（服务器)->卖豆浆 老板记性不好记不住你买豆浆 ；你买完豆浆老板给你一个条（设置cookie），拿条换豆浆（读取cookie）你在过去就知道你买过豆浆了
+    + 特点：比如买完烧饼又买的豆浆，此时之后把买豆浆的单子给老板，不会涉及到买烧饼的单子以键值对的形式存储，通过浏览器访问一个网站时，会将浏览器存储的跟网站相关的所有`cookie`
+      信息发送给该网站的服务器,`request.COOKIES`
+    + cookie是基于域名安全的 比如说访问百度设置一堆cookie，访问土豆网设置一堆cookie，那么访问百度的时候是不会携带土豆网的cookie过去的
+    + 设置cookie 需要`HttpResponse`类的对象或者是它子类的对象`HttpResponseRedirect`和`JsonResponse` `set_cookie` 浏览器发送给服务器的`cookie`
+      保存在`COOKIES`中
+    + cookie 是有过期时间的，如果不指定， 默认关闭浏览器之后cookie就会过期
+- *session 存储在服务器端*
+    + 你->去办健身卡，你的信息（session）都保存在电脑中，给你一个卡号（cookie sessionId），下一次只需要你的卡号，我就可以从我的电脑中找到你的信息
+    + 
   
 
     
