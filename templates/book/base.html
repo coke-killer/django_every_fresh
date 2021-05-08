@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}
+        父模板文件
+    {% endblock %}</title>
+</head>
+<body>
+<h1>导航条</h1>
+
+{#页面不同需要在覆膜板预留位置#}
+{% block xx %}
+    <h1>这是父模板中xx block中的内容</h1>
+{% endblock xx %}
+
+<h1>版权信息</h1>
+</body>
+</html>

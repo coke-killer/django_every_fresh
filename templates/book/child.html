@@ -1,0 +1,8 @@
+{% extends 'book/base.html' %}
+{% block title %}
+    子模版标题
+{% endblock %}
+{% block xx %}
+    {{ block.super }}
+    <h1>这是子模版中的内容，该块需要在父模板中预留</h1>
+{% endblock xx %}

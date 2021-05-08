@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>html_escape</title>
+</head>
+<body>
+html转义： <br>
+可使用safe过滤器关闭转义: <br>
+<h1>或者使用标签 { % auto escape % }</h1> 标签中可以使用多个
+{{ content|safe }} <br>
+{% autoescape  on %}
+    {{ content }}
+    {{ content }}
+{% endautoescape %}
+<br>
+模板硬编码中的字符串默认不会经过转义
+{{ test|default:'<h1>hello</h1>' }}
+{{ test|default:'&lt;h1&gt;hello&lt;/h1&gt;' }}
+</body>
+</html>

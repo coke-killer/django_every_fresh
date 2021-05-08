@@ -3,8 +3,9 @@
 from django.urls import path
 from book import views
 
+app_name = '[book]'
 urlpatterns = [
-    path('book/index', views.index),
+    path('book/index', views.index, name='index'),
     path('book/insert', views.insert),
     path('book/delete/<int:bid>', views.del_book),
     path('area/arease', views.area_se),
@@ -23,4 +24,11 @@ urlpatterns = [
     path('book/index2', views.index_two),
     path('book/temp_var', views.temp_var),
     path('book/temp_tags', views.temp_tags),
+    path('book/temp_inherit', views.temp_inherit),
+    path('book/html_escape', views.html_escape),
+    path('book/login_two_before', views.login_two_before),
+    path('book/login_two_check', views.login_two_check),
+    path('book/change_pwd', views.change_pwd),
+    path('book/change_pwd_action', views.change_pwd_action),
+    path('book/url_reverse', views.url_reverse),
 ]

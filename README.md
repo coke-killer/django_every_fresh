@@ -176,7 +176,7 @@ admin.site.register(HeroInfo, HeroInfoAdmin)
       f) 日期查询 查询1980年发表的图书 Bookinfo.objects.filter(
       b_pub_date__year=1980)
       Bookinfo.objects.filter(
-      b_pub_data__month=12) ```sql select * from book_bookinfo where b_pub_date between '1980-01-01' and '1980-12-31'```
+      b_pub_data__month=12) ```sql select * from book_bookinfo where b_pub_date between '1980-01-01' and '1980-12-31'```  
       g) 查询出版日期大于1980年1月1日 Bookinfo.objects.filter(b_pub_date__gt=date(1980,1,1))
     - exclude 返回不满足条件的数据   
       a)Bookinfo.objects.exclude(id=3)
@@ -184,15 +184,15 @@ admin.site.register(HeroInfo, HeroInfoAdmin)
       a) BookInfo.objects.all().order_by('id')  升序  
       b) BookInfo.objects.all().order_by('-id')  降序  
       c) 把id大于3的图书信息按阅读量从大到小排序显示 : BookInfo.objects.filter(id__gt=3).order_by('b_read')
-    - Q 对象 作用：用于查询条件之间的逻辑关系。 not或者or ,可以对Q对象进行&|-操作。  `from django.db.models import Q`
-      a) 查询id大于3或者阅读量大于30的图书信息 ：BookInfo.objects.filter(Q(id__gt=3)|Q(b_read__gt=30))
-      b) 查询id大于3或者阅读量大于30的图书信息 ：BookInfo.objects.filter(Q(id__gt=3)&Q(b_read__gt=30))
+    - Q 对象 作用：用于查询条件之间的逻辑关系。 not或者or ,可以对Q对象进行&|-操作。  `from django.db.models import Q`  
+      a) 查询id大于3或者阅读量大于30的图书信息 ：BookInfo.objects.filter(Q(id__gt=3)|Q(b_read__gt=30))  
+      b) 查询id大于3或者阅读量大于30的图书信息 ：BookInfo.objects.filter(Q(id__gt=3)&Q(b_read__gt=30))  
       c) 查询id不等于3 的图书信息 ：BookInfo.objects.filter(~Q(id=3))
     - F 对象 用于类属性之间的比较   
-      a)查询图书阅读量大于评论量的图书信息： BookInfo.objects.filter(b_read__gt=F('b_comment'))  
+      a)查询图书阅读量大于评论量的图书信息： BookInfo.objects.filter(b_read__gt=F('b_comment'))    
       b)查询图书阅读量大于2倍阅读量的叙述信息 BookInfo.objects.filter(b_read__gt=F('b_comment')*2)
     - 聚合函数 sum,avg,count,max,min aggregate函数   
-      a) 查询所有图书的数目 ： BookInfo.objects.all().aggregate(Count('id'))   .all可以省略 BookInfo.objects.count()
+      a) 查询所有图书的数目 ： BookInfo.objects.all().aggregate(Count('id'))   .all可以省略 BookInfo.objects.count()  
       b) 所有图书阅读量的综合 ：BookInfo.objects.aggregate(Sum('b_read'))  
       c) 统计所有id大于3的所有图书的数目 BookInfo.objects.filter(id__gt=3).count()
     - 查询集 all,filter,exclude,order_by,aggregate 查询之后是一个QuerySet对象 可以继续调用这些函数  
@@ -315,17 +315,17 @@ class Meta:
     + cookie 是有过期时间的，如果不指定， 默认关闭浏览器之后cookie就会过期
 - *session 存储在服务器端*
     + 你->去办健身卡，你的信息（session）都保存在电脑(服务器)中，给你一个卡号（cookie sessionId），下一次只需要你的卡号，我就可以从我的电脑中找到你的信息
-    + --------------------------------------------
+    + `--------------------------------------------`
     + session_key | session_data |
-    + --------------------------------------------
-    + 唯一标识码 |{'username':123,'age':10}|
-    + --------------------------------------------
+    + `--------------------------------------------`
+    + 唯一标识码 | {'username':123,'age':10}|
+    + `--------------------------------------------`
     + 返回应答，让浏览器保存这个唯一标识码也就是session_id
     + 在访问网站，服务器获取session_id,根据session_id的值取出对应的session的信息
     + 特点： 以键值对存储，依赖于cookie，是唯一的，唯一标识码保存在session_id cookie中，也是有过期时间的
     + 设置`session` `request.session['username']='xiaowang'`  `request.setsession='''`
     + 设置`session` 的过期时间 `request.session.set_expiry(5)` 秒数，0关闭浏览器过期，None,默认两周
-    + 使用`session`可以记住用户的登录状态 ,登录之后设置一个session.只要有这个session就说明是登陆过了，
+    + 使用`session`可以记住用户的登录状态 ,登录之后设置一个session.只要有这个session就说明是登陆过了
 
 # `cookie` 和 `session` 使用场景
 
@@ -374,5 +374,32 @@ class Meta:
 + 过滤器 改变日期显示格式 格式： 模板变量|过滤器：参数 `{{ book.b_pub_date | date:'Y年-M月-d日'}}`
 + [模板标签和内置过滤器参考资料](https://blog.csdn.net/lengfengyuyu/article/details/83342639)
 
-# 模板继承享有共同的部分减少代码复用
+# 模板继承
 
++ 享有共同的部分减少代码复用 可获取父亲block中的内容一起显示，也可以不获取内容直接在子模板中进行重写
+
+# html转义
+
++ 转义显示标签，不转义显示html样式
+
+# 装饰器 类似于aop,定义在方法执行之前运行那些函数
+
+# csrf攻击 跨站请求伪造 Django默认启用了csrf防护,只针对POST方式的提交
+
+首先做一个登录页，让用户输入用户名和密码进行登录，登陆成功之后调换到修改密码页面。在修改密码页面输入新密码，点击确认按钮，完成密码修改 登录页需要一个`login.html`,修改密码需要一个`change_pwd.html`
+在进行网站开发的时候，有些网站是用户登录之后才能访问的，加入用户访问了这个地址，需要进行登录判断，如果用户登录了的话可以进行后续的登录，如果没有登录需要跳转到登录页
+
++ 登录正常网站之后，你的浏览器保存了session_id，并且没有退出
++ 不小心访问了另外一个网站并且点击了页面上面的按钮
++ 因为无法获取隐藏域中的信息所以就认为是安全
+
+# 验证码
+
+为了防止暴力请求，可以加入验证码功能，如果验证码错误则不需要处理，可以减少业务服务器、数据服务器的压力
+
+# 反向解析
+
++ 根据url正则表达式的配置动态的生成url
++ 在项目的urls配置中指定namespace
++ 在app的url中指定name
++ 在app的url 的 urlpatterns上方加入app_name = '[book]'

@@ -5,8 +5,20 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 
 
 # request 就是HttpRequest类型的实例对象，包含浏览器请求的信息
-
 # Create your views here.
+def login_required(view_func):
+    # 登录判断装饰器
+    def wrapper(request, *view_args, **view_kwargs):
+        # 判断用户是否登录
+        if request.session.has_key('is_login'):
+            # 已经登录
+            view_func(request, *view_args, **view_kwargs)
+        else:
+            # 未登录
+            return HttpResponseRedirect('/book/login_two_before')
+
+    return wrapper
+
 
 def index(request):
     books = BookInfo.objects.all()
@@ -169,3 +181,74 @@ def temp_tags(request):
     '''模板标签'''
     books = BookInfo.objects.all()
     return render(request, 'book/temp_tags.html', {'books': books})
+
+
+def temp_inherit(request):
+    return render(request, 'book/child.html')
+
+
+def html_escape(request):
+    return render(request, 'book/html_escape.html', {'content': '<h1>hello</h1>'})
+
+
+def login_two_before(request):
+    # 获取cookie  username
+    # 判断用户是否登录
+    if request.session.has_key('is_login'):
+        # 用户已经登录
+        return HttpResponseRedirect('/book/change_pwd')
+    else:
+        # 用户未登录
+        if 'username' in request.COOKIES:
+            # 获取记住的用户名
+            username = request.COOKIES['username']
+        else:
+            username = ''
+        return render(request, "book/logintwo.html", {'username': username})
+
+
+def login_two_check(request):
+    # 1、 获取提交的用户名和密码
+    # request.POST保存post方式提交的参数 QueryDict类型对象
+    # request.GET保存get方式提交的参数 QueryDict 类型对象
+    # print(type(request.POST))
+    name = request.POST.get('username')
+    # print(name)
+    ps = request.POST.get('password')
+    # print(ps)
+    remember = request.POST.get('remember')
+    # 2、进行登录的校验
+    # 3、返回应答
+    if name == '123' and ps == '123':
+        resp = HttpResponseRedirect('/book/change_pwd')
+        if remember == 'on':
+            # 设置cookie username 过期时间
+            resp.set_cookie('username', name, max_age=7 * 24 * 3600)
+            # 记住用户的登陆状态,只要session中由is_login，就认为已经登录
+            request.session['is_login'] = True
+            request.session['name'] = name
+            print(name)
+            print(request.session)
+        return resp
+    else:
+        return HttpResponseRedirect('/book/login_two_before')
+
+
+# @login_required
+def change_pwd(request):
+    if not request.session.has_key('is_login'):
+        return HttpResponseRedirect('/book/login_two_before')
+    return render(request, 'book/change.html')
+
+
+def change_pwd_action(request):
+    # 1、获取密码
+    pwd = request.POST.get('pwd')
+    name = request.session.get('name')
+    print(name)
+    # 2、实际开发的时候修改数据库中的内容
+    return HttpResponse('%s修改密码为：%s' % (name, pwd))
+
+
+def url_reverse(request):
+    return render(request, 'book/url_reverse.html')

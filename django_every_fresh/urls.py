@@ -30,5 +30,5 @@ urlpatterns = [
     path('selectbookandhero', testdb.select_book_and_hero),
     path('index', views.index),
     path('', include('testapp.urls')),  # 包含testapp中的urls文件
-    path('', include('book.urls')),
+    path('', include('book.urls', namespace='book1')),
 ]
